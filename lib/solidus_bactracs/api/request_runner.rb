@@ -127,17 +127,11 @@ module SolidusBactracs
       def shipment_synced(shipment)
         shipment.update_attribute(:bactracs_synced_at, Time.zone.now)
 
-        ::Spree::Event.fire(
-          'solidus_bactracs.api.sync_completed',
-          shipment: shipment
-        )
+        ::Spree::Bus.publish(:'solidus_bactracs.api.sync_completed', shipment: shipment)
       end
 
       def shipment_sync_failed(shipment)
-        ::Spree::Event.fire(
-          'solidus_bactracs.api.sync_failed',
-          shipment: shipment
-        )
+        ::Spree::Bus.publish(:'solidus_bactracs.api.sync_failed', shipment:)
       end
     end
   end
