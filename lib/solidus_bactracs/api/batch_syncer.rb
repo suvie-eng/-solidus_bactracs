@@ -23,19 +23,11 @@ module SolidusBactracs
         begin
           response = client.bulk_create_orders(shipments)
         rescue RateLimitedError => e
-          ::Spree::Event.fire(
-            'solidus_bactracs.api.rate_limited',
-            shipments: shipments,
-            error: e,
-          )
+          ::Spree::Bus.publish(:'solidus_bactracs.api.rate_limited', shipments: shipments, error: e)
 
           raise e
         rescue RequestError => e
-          ::Spree::Event.fire(
-            'solidus_bactracs.api.sync_errored',
-            shipments: shipments,
-            error: e,
-          )
+          ::Spree::Bus.publish(:'solidus_bactracs.api.sync_errored', shipments: shipments, error: e)
 
           raise e
         end
